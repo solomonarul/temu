@@ -1,0 +1,3 @@
+# lini
+
+Lean INI parser. 

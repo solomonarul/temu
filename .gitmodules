@@ -1,0 +1,3 @@
+[submodule "lib/xbyak"]
+	path = lib/xbyak
+	url = https://github.com/solomonarul/xbyak.git
