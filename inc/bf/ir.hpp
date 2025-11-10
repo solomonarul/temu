@@ -41,7 +41,7 @@ namespace BF
             bool input, output;
         };
 
-        Result<void> compile_string(std::string&, CompileFlags = {.input = true, .output = true});
+        Result<void> compile(std::string&, CompileFlags = {.input = true, .output = true});
         std::string dump(void);
 
         constexpr std::vector<Instruction>& get_code(void) { return code; }

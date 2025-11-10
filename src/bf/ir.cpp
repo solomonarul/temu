@@ -13,6 +13,11 @@ namespace BF
         return mnemonics[type];
     }
 
+    bool Instruction::has_arguments(void)
+    {
+        return (this->type < Instruction::BF_INSTRUCTION_INP) && this->type != Instruction::BF_INSTRUCTION_NONE;
+    }
+
     std::string Instruction::args_to_string(void)
     {
         std::stringstream result;
@@ -27,15 +32,10 @@ namespace BF
             break;
         }
 
-        return result.str();
+        return std::move(result).str();
     }
 
-    bool Instruction::has_arguments(void)
-    {
-        return (this->type < Instruction::BF_INSTRUCTION_INP) && this->type != Instruction::BF_INSTRUCTION_NONE;
-    }
-
-    Result<void> IR::compile_string(std::string& code, CompileFlags flags)
+    Result<void> IR::compile(std::string& code, CompileFlags flags)
     {
         this->code.resize(0);
         this->code.reserve(code.size());
