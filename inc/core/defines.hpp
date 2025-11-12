@@ -1,14 +1,22 @@
 #pragma once
+
 #ifndef CORE_DEFINES_HPP
 #define CORE_DEFINES_HPP
 
 #include <string>
 #include <expected>
+#include <algorithm>
 
 namespace Core
 {
     template<typename T>
     using Result = std::expected<T, std::string>;
+
+    static inline std::string& to_lower(std::string& s) noexcept {
+        std::transform(s.begin(), s.end(), s.begin(),
+                    [](unsigned char c){ return std::tolower(c); });
+        return s;
+    }
 };
 
 #define ERROR(error) (std::unexpected(error))

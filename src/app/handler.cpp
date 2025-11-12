@@ -15,7 +15,7 @@ Result<void> App::run(int argc, char* argv[])
     IF_ERROR_FMT_RET(argc < 2, "Bad usage.\n[INFO]: Usage: {} [config.ini]\n", argv[0]);
 
     std::ifstream ini_in(argv[1]);
-    IF_ERROR_FMT_RET(!ini_in, "Could not open input file at path {}.", argv[1]);
+    IF_ERROR_FMT_RET(!ini_in.is_open(), "Could not open input file at path {}.", argv[1]);
 
     std::stringstream ini_stream; ini_stream << ini_in.rdbuf();
     ini_in.close();
@@ -29,7 +29,7 @@ Result<void> App::run(int argc, char* argv[])
 
     const std::string core = runner_section.entries["core"].to_string();
     if(core == "BF")
-        return handle_bf_emulation(ini_file);
+        return run_bf_emulation(ini_file);
 
     return ERROR_FMT("Invalid core specified in the Runner section of the input ini file: {}", core);
 }

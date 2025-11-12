@@ -8,6 +8,6 @@ using namespace Core;
 
 #include <lini/file.hpp>
 
-Result<void> handle_bf_emulation(LINI::File& ini_file);
+Result<void> run_bf_emulation(LINI::File& ini_file);
 
 #endif

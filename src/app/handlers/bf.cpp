@@ -15,7 +15,7 @@ enum InputType {
     BF_INPUT_COUNT
 };
 
-Result<void> handle_bf_runner(IRunner& runner, IR& code, InputType input)
+Result<void> run_bf_runner(IRunner& runner, IR& code, InputType input)
 {
     TRY(runner.load_ir(code));
 
@@ -42,7 +42,7 @@ Result<void> handle_bf_runner(IRunner& runner, IR& code, InputType input)
     return {};
 }
 
-Result<void> handle_bf_emulation(LINI::File& ini_file)
+Result<void> run_bf_emulation(LINI::File& ini_file)
 {
     IF_ERROR_RET(!ini_file.sections.contains("Runner.BF"), "No BF specific section in the input ini file.");
 
@@ -51,7 +51,7 @@ Result<void> handle_bf_emulation(LINI::File& ini_file)
 
     auto path = bf_section.entries["file"].to_string();
     std::ifstream bf_in(path);
-    IF_ERROR_FMT_RET(!bf_in, "Could not open BF source file at path {}.", path);
+    IF_ERROR_FMT_RET(!bf_in.is_open(), "Could not open BF source file at path {}.", path);
     std::string input_bf{std::istreambuf_iterator<char>(bf_in), {}};
     bf_in.close();
 
@@ -59,9 +59,7 @@ Result<void> handle_bf_emulation(LINI::File& ini_file)
     if(!bf_section.entries.contains("device"))
         input_type = BF_INPUT_NONE;
     else {
-        auto input = bf_section.entries["device"].to_string();
-        std::transform(input.begin(), input.end(), input.begin(),
-                [](unsigned char c){ return std::tolower(c); });
+        auto input = bf_section.entries["device"].to_string(); to_lower(input);
         if(input == "sdl")
             input_type = BF_INPUT_SDL;
         else if(input == "std")
@@ -78,14 +76,12 @@ Result<void> handle_bf_emulation(LINI::File& ini_file)
     
     IF_ERROR_RET(!bf_section.entries.contains("type"), "No BF runner type specified in input file.");
 
-    auto type = bf_section.entries["type"].to_string();
-    std::transform(type.begin(), type.end(), type.begin(),
-        [](unsigned char c){ return std::tolower(c); });
+    auto type = bf_section.entries["type"].to_string(); to_lower(type);
 
     std::unique_ptr<IRunner> runner;
     if (type == "jit") runner = std::make_unique<Runners::xbyak>();
     else if (type == "interpreter") runner = std::make_unique<Runners::Interpreter>();
     else return ERROR_FMT("Unknown BF runner type {} in input file.", type);
     
-    return handle_bf_runner(*runner, code, input_type);
+    return run_bf_runner(*runner, code, input_type);
 }
