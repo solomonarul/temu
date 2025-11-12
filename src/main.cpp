@@ -4,11 +4,9 @@
 
 int main(int argc, char* argv[])
 {
-    auto result = App::run(argc, argv);
-    if(!result)
-    {
-        std::cerr << "[EROR]: " << result.error() << "\n";
+    TRY_OR(App::run(argc, argv), {
+        std::cerr << "[EROR]: " << _result.error() << "\n";
         return EXIT_FAILURE;
-    }
+    });
     return EXIT_SUCCESS;
 }

@@ -12,9 +12,9 @@ namespace BF
 {
     struct IRunner
     {
-        virtual Result<void> load_ir(IR&) = 0;
+        virtual ~IRunner() = default;
         virtual Result<void> run(State&) = 0;
-
+        virtual Result<void> load_ir(IR&) = 0;
         virtual constexpr std::string get_name(void) = 0;
     };
 };

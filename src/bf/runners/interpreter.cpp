@@ -63,7 +63,7 @@ unimplemented_label:
         std::format(" with arguments {}", this->code[pc].args_to_string()) : "") << "!\n";
 
     result_message << std::format("        Interpreter state:\n        PC: {}\tI: {}\n", pc, index);
-    return std::unexpected<std::string>(result_message.str());
+    return ERROR(result_message.str());
 
 end_label:
     return {};

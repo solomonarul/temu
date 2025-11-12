@@ -21,9 +21,10 @@ namespace C8
         return std::move(result).str();
     }
 
-    Result<void> IR::compile(std::vector<uint8_t>& code)
+    Result<void> IR::compile(std::vector<uint16_t>& code)
     {
         (void)code;
+        this->code.emplace_back(Instruction{Instruction::C8_INSTRUCTION_END});
         return {};
     }
 

@@ -28,7 +28,7 @@ namespace BF
             BF_INSTRUCTION_COUNT
         } type;
 
-        ssize_t arg;
+        ssize_t arg = 0;
 
         bool has_arguments(void);
         std::string args_to_string(void);
@@ -51,8 +51,8 @@ namespace BF
 
         void optimize(void);
 
-        friend struct BF::Runners::Interpreter;
-        friend struct BF::Runners::xbyak;
+        friend struct Runners::Interpreter;
+        friend struct Runners::xbyak;
     };
 };
 

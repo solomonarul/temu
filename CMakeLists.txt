@@ -8,7 +8,7 @@ add_executable(
     ${PROJECT_NAME}
     "src/main.cpp"
     "src/app/handler.cpp"
-    "src/app/bf_handler.cpp"
+    "src/app/handlers/bf.cpp"
     "src/bf/ir.cpp"
     "src/bf/runners/interpreter.cpp"
     "src/bf/runners/xbyak.cpp"

@@ -1,19 +1,19 @@
 #include "bf/runners/xbyak.hpp"
 
-using namespace BF::Runners;
+using namespace BF;
 
-typedef void(*bf_funct_t)(BF::State*);
+typedef void(*bf_funct_t)(State*);
 
-Result<void> xbyak::load_ir(IR& ir)
+Result<void> BF::Runners::xbyak::load_ir(IR& ir)
 {
-    constexpr size_t CELL_SIZE = sizeof(typeof(BF::State::memory[0]));
+    constexpr size_t CELL_SIZE = sizeof(typeof(State::memory[0]));
 
     // Initial state (On System-V abi they are supposed to be restored after calls):
     // r12 = &state
     // r13 = state.memory[0]
     // r14w = 16-bit offset into memory
     mov(r12, rdi);
-    lea(r13, ptr [rdi + offsetof(BF::State, memory)]);
+    lea(r13, ptr [rdi + offsetof(State, memory)]);
     xor_(r14, r14);
 
     std::vector<std::pair<Xbyak::Label, Xbyak::Label>> startedLoops;
@@ -58,7 +58,7 @@ Result<void> xbyak::load_ir(IR& ir)
         {
             // state.f_in(rdi)
             // No checks are done, if f_out is invalid this will crash.
-            mov(rax, ptr [r12 + offsetof(BF::State, f_in)]);
+            mov(rax, ptr [r12 + offsetof(State, f_in)]);
             mov(rdi, r12);
             call(rax);
             mov(qword [r13 + r14 * CELL_SIZE], rax);
@@ -69,7 +69,7 @@ Result<void> xbyak::load_ir(IR& ir)
         {
             // state.f_out(rdi, rsi)
             // No checks are done, if f_out is invalid this will crash.
-            mov(rax, ptr [r12 + offsetof(BF::State, f_out)]);
+            mov(rax, ptr [r12 + offsetof(State, f_out)]);
             mov(rdi, r12);
             mov(rsi, qword [r13 + r14 * CELL_SIZE]);
             call(rax);
@@ -93,17 +93,17 @@ Result<void> xbyak::load_ir(IR& ir)
 
     auto result = Xbyak::GetError();
     if(result)
-        return std::unexpected(std::format("XByak generator error: {}", Xbyak::ConvertErrorToString(result)));
+        return ERROR_FMT("XByak generator error: {}", Xbyak::ConvertErrorToString(result));
 
     return {};
 }
 
-void xbyak::dump(std::ofstream& fout)
+void BF::Runners::xbyak::dump(std::ofstream& fout)
 {
     fout.write((char*)getCode<bf_funct_t>(), getSize());
 }
 
-Result<void> xbyak::run(State& state)
+Result<void> BF::Runners::xbyak::run(State& state)
 {
     state.reset();
     (getCode<bf_funct_t>())(&state);

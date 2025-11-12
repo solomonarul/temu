@@ -2,7 +2,7 @@
 #ifndef APP_BF_HANDLER_HPP
 #define APP_BF_HANDLER_HPP
 
-#include "../core/defines.hpp"
+#include "core/defines.hpp"
 
 using namespace Core;
 

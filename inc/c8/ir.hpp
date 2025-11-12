@@ -17,10 +17,11 @@ namespace C8
         enum Type
         {
             C8_INSTRUCTION_NONE = 0,
+            C8_INSTRUCTION_END,
             C8_INSTRUCTION_COUNT
         } type;
 
-        ssize_t arg0, arg1;
+        ssize_t arg = -1, arg1 = -1;
 
         bool has_arguments(void);
         std::string args_to_string(void);
@@ -29,7 +30,7 @@ namespace C8
 
     struct IR
     {
-        Result<void> compile(std::vector<uint8_t>&);
+        Result<void> compile(std::vector<uint16_t>&);
         std::string dump(void);
 
         constexpr std::vector<Instruction>& get_code(void) { return code; }

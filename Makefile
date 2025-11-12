@@ -57,3 +57,6 @@ bvr:
 
 r:
 	@./out/bin/${TARGET} ./roms/run.ini
+	
+v:
+	@valgrind ./out/bin/${TARGET} ./roms/run.ini
