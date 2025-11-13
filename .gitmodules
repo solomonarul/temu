@@ -1,3 +1,6 @@
 [submodule "lib/xbyak"]
 	path = lib/xbyak
 	url = https://github.com/solomonarul/xbyak.git
+[submodule "lib/lini"]
+	path = lib/lini
+	url = https://github.com/solomonarul/lini.git

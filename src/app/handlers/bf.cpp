@@ -38,7 +38,17 @@ Result<void> run_bf_runner(IRunner& runner, IR& code, InputType input)
         break;
     }
     TRY(runner.run(state));
-    std::cout.flush();
+
+    switch(input)
+    {
+    case BF_INPUT_STD:
+        std::cout << '\n';
+        break;
+
+    default:
+        break;
+    }
+    
     return {};
 }
 
