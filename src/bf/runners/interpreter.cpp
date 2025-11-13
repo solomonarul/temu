@@ -19,7 +19,7 @@ Result<void> Interpreter::run(State& state)
     state.reset();
 
     constexpr void* code_list[] = { 
-        &&unimplemented_label, &&add_label, &&mov_label, &&jmp_label,
+        &&unimplemented_label, &&add_label, &&mov_label, &&jmp_label, &&add_at_offset_label,
         &&in_label, &&out_label, &&clr_label, &&end_label, &&unimplemented_label
     };
 
@@ -45,6 +45,8 @@ out_label: // Same as xbyak, if f_out is not set this will crash.
     state.f_out(state, state.memory[index]); NEXT();
 
 clr_label: state.memory[index] = 0; NEXT();
+
+add_at_offset_label: state.memory[index + this->code[pc].arg] += state.memory[index], state.memory[index] = 0; NEXT();
 
 unimplemented_label:
     result_message << std::format(

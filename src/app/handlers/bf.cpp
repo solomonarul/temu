@@ -63,7 +63,7 @@ Result<void> run_bf_emulation(LINI::File& ini_file)
     std::ifstream bf_in(path);
     IF_ERROR_FMT_RET(!bf_in.is_open(), "Could not open BF source file at path {}.", path);
     std::string input_bf{std::istreambuf_iterator<char>(bf_in), {}};
-    bf_in.close();
+    std::move(bf_in).close();
 
     auto input_type = BF_INPUT_STD;
     if(!bf_section.entries.contains("device"))

@@ -5,7 +5,7 @@
 namespace BF
 {
     static constexpr std::string_view mnemonics[] = {
-        "", "ADD", "MOV", "JMP", " IN", "OUT", "CLR", "END", ""
+        "", "ADD", "MOV", "JMP", "AAO", " IN", "OUT", "CLR", "END", ""
     };
 
     std::string_view Instruction::type_to_string(Instruction::Type type)
@@ -120,7 +120,15 @@ namespace BF
                 Instruction{.type = Instruction::BF_INSTRUCTION_JMP, .arg = 3},
                 Instruction{.type = Instruction::BF_INSTRUCTION_ADD, .arg = 0},
                 Instruction{.type = Instruction::BF_INSTRUCTION_JMP, .arg = -1}
-            }, Instruction{.type = Instruction::BF_INSTRUCTION_CLR, .arg = 0}}
+            }, Instruction{.type = Instruction::BF_INSTRUCTION_CLR}},
+            {{   // 6j -1a xm 1a -xm -4j
+                Instruction{.type = Instruction::BF_INSTRUCTION_JMP, .arg = 6},
+                Instruction{.type = Instruction::BF_INSTRUCTION_ADD, .arg = -1},
+                Instruction{.type = Instruction::BF_INSTRUCTION_MOV, .arg = 0},
+                Instruction{.type = Instruction::BF_INSTRUCTION_ADD, .arg = 1},
+                Instruction{.type = Instruction::BF_INSTRUCTION_MOV, .arg = 0},
+                Instruction{.type = Instruction::BF_INSTRUCTION_JMP, .arg = -4}
+            }, Instruction{.type = Instruction::BF_INSTRUCTION_AAO, .arg = -1}}
         };
 
         bool found_sequence = false;
@@ -184,6 +192,6 @@ namespace BF
                 out << ' ' << instr.arg;
             out << '\n';
         }
-        return std::move(out).str();
+        return out.str();
     }
 };

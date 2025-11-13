@@ -59,4 +59,7 @@ r:
 	@./out/bin/${TARGET} ./roms/run.ini
 	
 v:
-	@valgrind ./out/bin/${TARGET} ./roms/run.ini
+	@valgrind --log-file=out/valgrind.log ./out/bin/${TARGET} ./roms/run.ini > /dev/null
+	@valgrind --tool=massif ./out/bin/${TARGET} ./roms/run.ini > /dev/null
+	@ms_print massif* > out/massif.log
+	@rm -r massif* > /dev/null

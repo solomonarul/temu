@@ -2,7 +2,6 @@
 
 #include <format>
 #include <fstream>
-#include <iostream>
 
 using namespace App;
 
@@ -17,11 +16,10 @@ Result<void> App::run(int argc, char* argv[])
     std::ifstream ini_in(argv[1]);
     IF_ERROR_FMT_RET(!ini_in.is_open(), "Could not open input file at path {}.", argv[1]);
 
-    std::stringstream ini_stream; ini_stream << ini_in.rdbuf();
-    ini_in.close();
+    std::string ini_contents = {std::istreambuf_iterator<char>(ini_in), {}};
+    std::move(ini_in).close();
 
-    LINI::File ini_file;
-    ini_file.parse(ini_stream);
+    LINI::File ini_file = LINI::File().parse(ini_contents);
     IF_ERROR_RET(!ini_file.sections.contains("Runner"), "No Runner specified in input ini file.");
 
     LINI::Section& runner_section = ini_file.sections["Runner"];

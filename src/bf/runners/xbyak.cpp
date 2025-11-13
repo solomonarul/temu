@@ -57,8 +57,15 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
             }
             break;
 
+        case Instruction::BF_INSTRUCTION_AAO:
+            mov(rax, CELL_AT(r14));
+            mov(CELL_AT(r14), 0);
+            mov(rdx, r14);
+            add(rdx, instruction.arg);
+            add(CELL_AT(rdx), rax);
+            break;
+
         case Instruction::BF_INSTRUCTION_INP:
-        {
             // state.f_in(rdi)
             // No checks are done, if f_out is invalid this will crash.
             mov(rax, ptr [r12 + offsetof(State, f_in)]);
@@ -66,10 +73,8 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
             call(rax);
             mov(CELL_AT(r14), rax);
             break;
-        }
 
         case Instruction::BF_INSTRUCTION_OUT:
-        {
             // state.f_out(rdi, rsi)
             // No checks are done, if f_out is invalid this will crash.
             mov(rax, ptr [r12 + offsetof(State, f_out)]);
@@ -77,7 +82,6 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
             mov(rsi, CELL_AT(r14));
             call(rax);
             break;
-        }
 
         case Instruction::BF_INSTRUCTION_CLR:
             mov(CELL_AT(r14), 0);

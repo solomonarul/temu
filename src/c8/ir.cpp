@@ -31,6 +31,6 @@ namespace C8
     std::string IR::dump(void)
     {
         std::stringstream out;
-        return std::move(out).str();
+        return out.str();
     }
 };

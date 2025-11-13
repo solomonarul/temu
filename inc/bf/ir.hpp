@@ -21,6 +21,7 @@ namespace BF
             BF_INSTRUCTION_ADD, // + -
             BF_INSTRUCTION_MOV, // < >
             BF_INSTRUCTION_JMP, // [ ]
+            BF_INSTRUCTION_AAO, // [->+<]
             BF_INSTRUCTION_INP, //  ,
             BF_INSTRUCTION_OUT, //  .
             BF_INSTRUCTION_CLR, // [-]
