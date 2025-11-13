@@ -1,9 +1,9 @@
 #pragma once
-
 #ifndef CORE_DEFINES_HPP
 #define CORE_DEFINES_HPP
 
 #include <string>
+#include <format>
 #include <expected>
 #include <algorithm>
 
@@ -18,6 +18,14 @@ namespace Core
         return s;
     }
 };
+
+constexpr auto TTY = [](std::string_view text, int code) {
+    return std::format("\033[{}m{}\033[0m", code, text);
+};
+
+constexpr auto TTY_ERROR   = [](std::string_view t){ return TTY(t, 31); };
+constexpr auto TTY_GOOD = [](std::string_view t){ return TTY(t, 32); };
+constexpr auto TTY_WARN  = [](std::string_view t){ return TTY(t, 33); };
 
 #define ERROR(error) (std::unexpected(error))
 
@@ -35,4 +43,4 @@ namespace Core
 #define TRY_OR(expr, block) \
     do { auto _result = (expr); if(!_result) block } while(0)
 
-#endif  
+#endif      

@@ -11,11 +11,14 @@ Result<void> Interpreter::load_ir(IR& ir)
     return {};
 }
 
+#define NEXT() goto *code_list[this->code[++pc].type]
+#define DISPATCH() goto *code_list[this->code[pc].type];
+
 Result<void> Interpreter::run(State& state)
 {
     state.reset();
 
-    static void* code_list[(int)Instruction::BF_INSTRUCTION_COUNT + 1] = { 
+    constexpr void* code_list[] = { 
         &&unimplemented_label, &&add_label, &&mov_label, &&jmp_label,
         &&in_label, &&out_label, &&clr_label, &&end_label, &&unimplemented_label
     };
@@ -24,34 +27,24 @@ Result<void> Interpreter::run(State& state)
     size_t pc = 0;
     uint16_t index = 0;
 
-    goto *code_list[this->code[pc].type];
+    DISPATCH();
 
-add_label:
-    state.memory[index] += this->code[pc].arg;
-    goto *code_list[this->code[++pc].type];
+add_label: state.memory[index] += this->code[pc].arg; NEXT();
 
-mov_label:
-    index += this->code[pc].arg;
-    goto *code_list[this->code[++pc].type];
+mov_label: index += this->code[pc].arg; NEXT();
 
 jmp_label:
     pc += ((this->code[pc].arg > 0 && state.memory[index] == 0)
         || (this->code[pc].arg < 0 && state.memory[index] != 0)) ? this->code[pc].arg : 1;
-    goto *code_list[this->code[pc].type];
+    DISPATCH();
 
-in_label:
-    // Same as xbyak, if f_in is not set this will crash.
-    state.memory[index] = state.f_in(state);
-    goto *code_list[this->code[++pc].type];
+in_label: // Same as xbyak, if f_in is not set this will crash.
+    state.memory[index] = state.f_in(state); NEXT();
 
-out_label:
-    // Same as xbyak, if f_out is not set this will crash.
-    state.f_out(state, state.memory[index]);
-    goto *code_list[this->code[++pc].type];
+out_label: // Same as xbyak, if f_out is not set this will crash.
+    state.f_out(state, state.memory[index]); NEXT();
 
-clr_label:
-    state.memory[index] = 0;
-    goto *code_list[this->code[++pc].type];
+clr_label: state.memory[index] = 0; NEXT();
 
 unimplemented_label:
     result_message << std::format(
@@ -68,3 +61,6 @@ unimplemented_label:
 end_label:
     return {};
 }
+
+#undef DISPATCH
+#undef NEXT

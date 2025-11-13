@@ -2,12 +2,16 @@
 
 using namespace BF;
 
-typedef void(*bf_funct_t)(State*);
+#define CELL_AT(offset) qword [r13 + (offset) * CELL_SIZE]
+
+using bf_funct_t = void(*)(State*);
+
+constexpr size_t CELL_SIZE = sizeof(decltype(State::memory[0]));
+
+struct LoopLabels { Xbyak::Label start, end; };
 
 Result<void> BF::Runners::xbyak::load_ir(IR& ir)
 {
-    constexpr size_t CELL_SIZE = sizeof(typeof(State::memory[0]));
-
     // Initial state (On System-V abi they are supposed to be restored after calls):
     // r12 = &state
     // r13 = state.memory[0]
@@ -16,9 +20,9 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
     lea(r13, ptr [rdi + offsetof(State, memory)]);
     xor_(r14, r14);
 
-    std::vector<std::pair<Xbyak::Label, Xbyak::Label>> startedLoops;
+    std::vector<LoopLabels> startedLoops;
 
-    for (auto instruction: ir.code)
+    for (const auto& instruction: ir.code)
     {
         switch(instruction.type)
         {
@@ -27,29 +31,28 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
             break;
 
         case Instruction::BF_INSTRUCTION_ADD:
-            add(qword [r13 + r14 * CELL_SIZE], instruction.arg);
+            add(CELL_AT(r14), instruction.arg);
             break;
 
         case Instruction::BF_INSTRUCTION_JMP:
             if(instruction.arg > 0)
             {
-                Xbyak::Label start, end;
-                startedLoops.emplace_back(std::make_pair(start, end));
+                startedLoops.emplace_back(LoopLabels{Xbyak::Label(), Xbyak::Label()});
                 
                 auto& back = startedLoops.back();
-                mov(rax, qword [r13 + r14 * CELL_SIZE]);
+                mov(rax, CELL_AT(r14));
                 cmp(rax, 0);
-                jz(back.second, T_NEAR);
-                L(back.first);
+                jz(back.end, T_NEAR);
+                L(back.start);
             }
             else {
-                auto& brackets = startedLoops.back();
+                auto& back = startedLoops.back();
                 
-                mov(rax, qword [r13 + r14 * CELL_SIZE]);
+                mov(rax, CELL_AT(r14));
                 cmp(rax, 0);
-                jnz(brackets.first,T_NEAR);
+                jnz(back.start,T_NEAR);
 
-                L(brackets.second);
+                L(back.end);
                 startedLoops.pop_back();
             }
             break;
@@ -61,7 +64,7 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
             mov(rax, ptr [r12 + offsetof(State, f_in)]);
             mov(rdi, r12);
             call(rax);
-            mov(qword [r13 + r14 * CELL_SIZE], rax);
+            mov(CELL_AT(r14), rax);
             break;
         }
 
@@ -71,13 +74,13 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
             // No checks are done, if f_out is invalid this will crash.
             mov(rax, ptr [r12 + offsetof(State, f_out)]);
             mov(rdi, r12);
-            mov(rsi, qword [r13 + r14 * CELL_SIZE]);
+            mov(rsi, CELL_AT(r14));
             call(rax);
             break;
         }
 
         case Instruction::BF_INSTRUCTION_CLR:
-            mov(qword [r13 + r14 * CELL_SIZE], 0);
+            mov(CELL_AT(r14), 0);
             break;
 
         case Instruction::BF_INSTRUCTION_END:
@@ -91,12 +94,13 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
     }
     readyRE();
 
-    auto result = Xbyak::GetError();
-    if(result)
-        return ERROR_FMT("XByak generator error: {}", Xbyak::ConvertErrorToString(result));
+    if(auto error = Xbyak::GetError(); error)
+        return ERROR_FMT("XByak generator error: {}", Xbyak::ConvertErrorToString(error));
 
     return {};
 }
+
+#undef CELL_AT
 
 void BF::Runners::xbyak::dump(std::ofstream& fout)
 {
