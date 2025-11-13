@@ -37,7 +37,7 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
         case Instruction::BF_INSTRUCTION_JMP:
             if(instruction.arg > 0)
             {
-                startedLoops.emplace_back(LoopLabels{Xbyak::Label(), Xbyak::Label()});
+                startedLoops.emplace_back(Xbyak::Label(), Xbyak::Label());
                 
                 auto& back = startedLoops.back();
                 mov(rax, CELL_AT(r14));

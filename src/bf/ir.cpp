@@ -49,7 +49,7 @@ namespace BF
                 if(this->code.back().arg == 0)
                     this->code.pop_back();
             }
-            else this->code.emplace_back(Instruction{ type, delta });
+            else this->code.emplace_back(type, delta);
         };
 
         for(const auto ch : code)
@@ -62,7 +62,7 @@ namespace BF
             case '>': emit_repeating_opcode(Instruction::BF_INSTRUCTION_MOV, +1); break;
 
             case '[':
-                this->code.emplace_back(Instruction{ Instruction::BF_INSTRUCTION_JMP });
+                this->code.emplace_back( Instruction::BF_INSTRUCTION_JMP );
                 bracketStack.emplace_back(this->code.size() - 1);
                 break;
 
@@ -74,7 +74,7 @@ namespace BF
                     ssize_t distance = this->code.size() - oldIndex;
                     if(distance > 1)
                     {
-                        this->code.emplace_back(Instruction{ Instruction::BF_INSTRUCTION_JMP, -distance + 1 });
+                        this->code.emplace_back(Instruction::BF_INSTRUCTION_JMP, -distance + 1);
                         this->code[oldIndex].arg = distance + 1;
                     }
                     else this->code.pop_back(); // Remove [] pairs.
@@ -87,12 +87,12 @@ namespace BF
 
             case ',':
                 if(flags.input)
-                    this->code.emplace_back(Instruction{Instruction::BF_INSTRUCTION_INP });
+                    this->code.emplace_back(Instruction::BF_INSTRUCTION_INP);
                 break;
 
             case '.':
                 if(flags.output)
-                    this->code.emplace_back(Instruction{Instruction::BF_INSTRUCTION_OUT });
+                    this->code.emplace_back(Instruction::BF_INSTRUCTION_OUT);
                 break;
 
             default:
@@ -102,7 +102,7 @@ namespace BF
 
             optimize();
         }
-        this->code.emplace_back(Instruction{Instruction::BF_INSTRUCTION_END });
+        this->code.emplace_back(Instruction::BF_INSTRUCTION_END);
 
         if(!bracketStack.empty())
         {
