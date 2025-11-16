@@ -2,6 +2,8 @@
 
 Not affiliated with the Chinese company.
 
+<img src=".github/images/bf.png" align="center">
+
 ---
 
 <a href="https://brainmade.org/">
