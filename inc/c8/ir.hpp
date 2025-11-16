@@ -1,6 +1,4 @@
 #pragma once
-#ifndef C8_IR_HPP
-#define C8_IR_HPP
 
 #include "../core/defines.hpp"
 
@@ -39,5 +37,3 @@ namespace C8
         std::vector<Instruction> code;
     };
 };
-
-#endif

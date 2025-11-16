@@ -1,6 +1,4 @@
 #pragma once
-#ifndef BF_IR_HPP
-#define BF_IR_HPP
 
 #include "../core/defines.hpp"
 
@@ -42,7 +40,7 @@ namespace BF
             bool input, output;
         };
 
-        Result<void> compile(std::string&, CompileFlags = {.input = true, .output = true});
+        Result<void> compile(std::string_view, CompileFlags = {.input = true, .output = true});
         std::string dump(void);
 
         constexpr std::vector<Instruction>& get_code(void) { return code; }
@@ -56,5 +54,3 @@ namespace BF
         friend struct Runners::xbyak;
     };
 };
-
-#endif

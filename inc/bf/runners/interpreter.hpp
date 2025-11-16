@@ -1,14 +1,12 @@
 #pragma once
-#ifndef BF_INTERPRETER_HPP
-#define BF_INTERPRETER_HPP
 
 #include "../runner.hpp"
 
 namespace BF::Runners
 {
-    struct Interpreter : IRunner
+    struct Interpreter : public IRunner
     {
-        Result<void> run(State&) override;
+        Result<void> run(State&, IDeviceHandler*) override;
         Result<void> load_ir(IR&) override;
 
         constexpr std::string get_name(void) override { return "Interpreter"; }
@@ -17,5 +15,3 @@ namespace BF::Runners
         std::vector<Instruction> code;
     };
 };
-
-#endif

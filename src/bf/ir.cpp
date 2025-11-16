@@ -35,7 +35,7 @@ namespace BF
         return std::move(result).str();
     }
 
-    Result<void> IR::compile(std::string& code, CompileFlags flags)
+    Result<void> IR::compile(std::string_view code, CompileFlags flags)
     {
         this->code.resize(0);
         this->code.reserve(code.size());
@@ -52,7 +52,7 @@ namespace BF
             else this->code.emplace_back(type, delta);
         };
 
-        for(const auto ch : code)
+        for(const auto& ch : code)
         {
             switch(ch)
             {

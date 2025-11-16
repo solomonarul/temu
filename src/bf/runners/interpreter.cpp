@@ -14,8 +14,9 @@ Result<void> Interpreter::load_ir(IR& ir)
 #define NEXT() goto *code_list[this->code[++pc].type]
 #define DISPATCH() goto *code_list[this->code[pc].type];
 
-Result<void> Interpreter::run(State& state)
+Result<void> Interpreter::run(State& state, IDeviceHandler* handler)
 {
+    (void)handler;
     state.reset();
 
     constexpr void* code_list[] = { 
@@ -38,11 +39,11 @@ jmp_label:
         || (this->code[pc].arg < 0 && state.memory[index] != 0)) ? this->code[pc].arg : 1;
     DISPATCH();
 
-in_label: // Same as xbyak, if f_in is not set this will crash.
-    state.memory[index] = state.f_in(state); NEXT();
+in_label: // Same as xbyak, if input is not set this will crash.
+    state.memory[index] = state.device->handler.input(state); NEXT();
 
-out_label: // Same as xbyak, if f_out is not set this will crash.
-    state.f_out(state, state.memory[index]); NEXT();
+out_label: // Same as xbyak, if output is not set this will crash.
+    state.device->handler.output(state, state.memory[index]); NEXT();
 
 clr_label: state.memory[index] = 0; NEXT();
 

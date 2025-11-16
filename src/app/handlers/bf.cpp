@@ -3,54 +3,10 @@
 #include <iostream>
 #include <memory>
 
-#include "bf/runners/interpreter.hpp"
-#include "bf/runners/xbyak.hpp"
+#include "bf/devices/all.hpp"
+#include "bf/runners/all.hpp"
 
 using namespace BF;
-
-enum InputType {
-    BF_INPUT_NONE = 0,
-    BF_INPUT_STD,
-    BF_INPUT_SDL,
-    BF_INPUT_COUNT
-};
-
-Result<void> run_bf_runner(IRunner& runner, IR& code, InputType input)
-{
-    TRY(runner.load_ir(code));
-
-    State state;
-    switch(input)
-    {
-    case BF_INPUT_STD:
-        state.f_in = [](State&) -> size_t {
-            char ch;
-            if(!std::cin.get(ch))
-                return std::char_traits<char>::eof();
-            return static_cast<size_t>(ch);
-        };
-        state.f_out = [](State&, size_t data) -> void {
-            std::cout.put(static_cast<char>(data));
-        };
-        break;
-
-    default:
-        break;
-    }
-    TRY(runner.run(state));
-
-    switch(input)
-    {
-    case BF_INPUT_STD:
-        std::cout << '\n';
-        break;
-
-    default:
-        break;
-    }
-    
-    return {};
-}
 
 Result<void> run_bf_emulation(LINI::File& ini_file)
 {
@@ -65,21 +21,16 @@ Result<void> run_bf_emulation(LINI::File& ini_file)
     std::string input_bf{std::istreambuf_iterator<char>(bf_in), {}};
     std::move(bf_in).close();
 
-    auto input_type = BF_INPUT_STD;
-    if(!bf_section.entries.contains("device"))
-        input_type = BF_INPUT_NONE;
-    else {
-        auto input = bf_section.entries["device"].to_string(); to_lower(input);
-        if(input == "sdl")
-            input_type = BF_INPUT_SDL;
-        else if(input == "std")
-            input_type = BF_INPUT_STD;
-        else
-            input_type = BF_INPUT_NONE;
+    std::unique_ptr<IDevice> input = std::make_unique<Devices::None>();
+    if(bf_section.entries.contains("device"))
+    {
+        auto type = bf_section.entries["device"].to_string();
+        to_lower(type);
+        if(type == "std") input = std::make_unique<Devices::STD>();
     }
 
     IR code;
-    TRY(code.compile(input_bf, (input_type == BF_INPUT_NONE) ?
+    TRY(code.compile(input_bf, (input->get_type() >= BF::EDEVICE_NONE) ?
         IR::CompileFlags{.input = false, .output = false} :
         IR::CompileFlags{.input = true, .output = true}
     ));
@@ -93,5 +44,11 @@ Result<void> run_bf_emulation(LINI::File& ini_file)
     else if (type == "interpreter") runner = std::make_unique<Runners::Interpreter>();
     else return ERROR_FMT("Unknown BF runner type {} in input file.", type);
     
-    return run_bf_runner(*runner, code, input_type);
+    TRY(runner->load_ir(code));
+
+    State state;
+    state.device.swap(input);
+    TRY(runner->run(state, &state.device.get()->handler));
+
+    return {};
 }

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef CORE_DEFINES_HPP
-#define CORE_DEFINES_HPP
 
 #include <string>
 #include <format>
@@ -42,5 +40,3 @@ constexpr auto TTY_WARN  = [](std::string_view t){ return TTY(t, 33); };
 
 #define TRY_OR(expr, block) \
     do { auto _result = (expr); if(!_result) block } while(0)
-
-#endif      

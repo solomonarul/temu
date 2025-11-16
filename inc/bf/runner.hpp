@@ -1,6 +1,4 @@
 #pragma once
-#ifndef BF_RUNNER_HPP
-#define BF_RUNNER_HPP
 
 #include "../core/defines.hpp"
 #include "ir.hpp"
@@ -13,10 +11,8 @@ namespace BF
     struct IRunner
     {
         virtual ~IRunner() = default;
-        virtual Result<void> run(State&) = 0;
+        virtual Result<void> run(State&, IDeviceHandler*) = 0;
         virtual Result<void> load_ir(IR&) = 0;
         virtual constexpr std::string get_name(void) = 0;
     };
 };
-
-#endif
