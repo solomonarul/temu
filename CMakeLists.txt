@@ -10,7 +10,6 @@ add_executable(
     "src/app/handler.cpp"
     "src/app/handlers/bf.cpp"
     "src/bf/ir.cpp"
-    "src/bf/devices/none.cpp"
     "src/bf/devices/std.cpp"
     "src/bf/runners/interpreter.cpp"
     "src/bf/runners/xbyak.cpp"
