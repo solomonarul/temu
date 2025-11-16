@@ -8,15 +8,12 @@ namespace BF
         "", "ADD", "MOV", "JMP", "AAO", " IN", "OUT", "CLR", "END", ""
     };
 
-    std::string_view Instruction::type_to_string(Instruction::Type type)
-    {
-        return mnemonics[type];
-    }
-
     bool Instruction::has_arguments(void)
     {
         return (this->type < Instruction::BF_INSTRUCTION_INP) && this->type != Instruction::BF_INSTRUCTION_NONE;
     }
+
+    std::string_view Instruction::type_to_string(Instruction::Type type) { return mnemonics[type]; }
 
     std::string Instruction::args_to_string(void)
     {

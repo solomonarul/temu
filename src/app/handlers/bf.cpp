@@ -1,6 +1,5 @@
 #include "app/handlers/bf.hpp"
 
-#include <iostream>
 #include <memory>
 
 #include "bf/devices/all.hpp"

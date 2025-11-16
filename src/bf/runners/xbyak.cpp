@@ -16,6 +16,8 @@ Result<void> BF::Runners::xbyak::load_ir(IR& ir)
     // r12 = &state.handler
     // r13 = state.memory[0]
     // r14w = 16-bit offset into memory
+    // System-V abi arguments in order: rdi, rsi, rdx, rcx, r8, r9
+    // Everything else goes onto the stack, except floating point values which go xmm0..xmm7.
     mov(r12, rsi);
     lea(r13, ptr[rdi + offsetof(State, memory)]);
     xor_(r14, r14);

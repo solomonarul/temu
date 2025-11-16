@@ -3,8 +3,6 @@
 #include <format>
 #include <fstream>
 
-using namespace App;
-
 #include <lini/file.hpp>
 
 #include "app/handlers/bf.hpp"
